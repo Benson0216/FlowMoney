@@ -27,11 +27,20 @@ enum TransactionSource: String, Codable {
     case bank
 }
 
+enum TransactionType: String, Codable {
+    case income
+    case expense
+    case transfer
+}
+
 @Model
 final class Transaction {
     var id: UUID
+    
     var amount: Decimal
     var currencyCode: String
+    var type: TransactionType
+    
     var date: Date
 
     var merchantName: String
@@ -49,6 +58,7 @@ final class Transaction {
         id: UUID = UUID(),
         amount: Decimal,
         currencyCode: String = "TWD",
+        type: TransactionType = .expense,
         date: Date = .now,
         merchantName: String,
         categoryName: String,
@@ -61,6 +71,7 @@ final class Transaction {
         self.id = id
         self.amount = amount
         self.currencyCode = currencyCode
+        self.type = type
         self.date = date
         self.merchantName = merchantName
         self.categoryName = categoryName
