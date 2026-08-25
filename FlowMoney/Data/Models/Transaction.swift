@@ -13,7 +13,7 @@ enum PaymentMethod: String, Codable {
     case cash
     case creditCard
     case debitCard
-    case applyPay
+    case applePay
     case bankTransfer
     case other
 }
