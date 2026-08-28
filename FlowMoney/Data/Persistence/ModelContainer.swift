@@ -11,7 +11,8 @@ enum PersistenceController{
     static let shared: ModelContainer = {
         do {
             return try ModelContainer(
-                for: Transaction.self
+                for: Transaction.self,
+                Category.self
             )
         }
         catch {
