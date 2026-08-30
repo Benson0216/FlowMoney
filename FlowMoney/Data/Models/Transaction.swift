@@ -45,6 +45,9 @@ final class Transaction {
 
     var merchantName: String
     var categoryName: String
+    
+    @Relationship(deleteRule: .nullify)
+    var category: Category?
 
     var paymentMethod: PaymentMethod
     var note: String?
@@ -62,6 +65,7 @@ final class Transaction {
         date: Date = .now,
         merchantName: String,
         categoryName: String,
+        category: Category? = nil,
         paymentMethod: PaymentMethod,
         note: String? = nil,
         source: TransactionSource = .manual,
@@ -75,6 +79,7 @@ final class Transaction {
         self.date = date
         self.merchantName = merchantName
         self.categoryName = categoryName
+        self.category = category
         self.paymentMethod = paymentMethod
         self.note = note
         self.source = source

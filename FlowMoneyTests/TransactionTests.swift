@@ -6,6 +6,7 @@
 //
 
 import XCTest
+import SwiftData
 @testable import FlowMoney
 
 final class TransactionTests: XCTestCase {
@@ -82,5 +83,109 @@ final class TransactionTests: XCTestCase {
         XCTAssertEqual(income.type, .income)
         XCTAssertEqual(expense.type, .expense)
         XCTAssertEqual(transfer.type, .transfer)
+    }
+    
+    func testTransactionCanHaveCategory() {
+        let category = Category(
+            name: "Food",
+            icon: "fork.knife",
+            type: .expense
+        )
+
+        let transaction = Transaction(
+            amount: 500,
+            merchantName: "Lunch",
+            categoryName: "Food",
+            category: category,
+            paymentMethod: .creditCard
+        )
+
+        XCTAssertNotNil(transaction.category)
+        XCTAssertTrue(transaction.category === category)
+    }
+    
+    func testTransactionCanExistWithoutCategory() {
+        let transaction = Transaction(
+            amount: 500,
+            merchantName: "Unknown",
+            categoryName: "Uncategorized",
+            paymentMethod: .cash
+        )
+
+        XCTAssertNil(transaction.category)
+    }
+    
+    func testTransactionCategoryRelationshipPersists() throws {
+        let container = try ModelContainer(
+            for: Transaction.self,
+            Category.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+
+        let context = ModelContext(container)
+
+        let category = Category(
+            name: "Food",
+            icon: "fork.knife",
+            type: .expense
+        )
+
+        let transaction = Transaction(
+            amount: 500,
+            merchantName: "Lunch",
+            categoryName: "Food",
+            category: category,
+            paymentMethod: .creditCard
+        )
+
+        context.insert(category)
+        context.insert(transaction)
+
+        try context.save()
+
+        let descriptor = FetchDescriptor<Transaction>()
+        let transactions = try context.fetch(descriptor)
+
+        XCTAssertEqual(transactions.count, 1)
+        XCTAssertNotNil(transactions.first?.category)
+        XCTAssertEqual(transactions.first?.category?.name, "Food")
+    }
+    
+    func testDeletingCategoryRemovesCategory() throws {
+        let container = try ModelContainer(
+            for: Transaction.self,
+            Category.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+
+        let context = ModelContext(container)
+
+        let category = Category(
+            name: "Food",
+            icon: "fork.knife",
+            type: .expense
+        )
+
+        let transaction = Transaction(
+            amount: 500,
+            merchantName: "Lunch",
+            categoryName: "Food",
+            category: category,
+            paymentMethod: .creditCard
+        )
+
+        context.insert(category)
+        context.insert(transaction)
+
+        try context.save()
+
+        context.delete(category)
+
+        try context.save()
+
+        let categoryDescriptor = FetchDescriptor<FlowMoney.Category>()
+        let categories = try context.fetch(categoryDescriptor)
+
+        XCTAssertEqual(categories.count, 0)
     }
 }
