@@ -188,4 +188,64 @@ final class TransactionTests: XCTestCase {
 
         XCTAssertEqual(categories.count, 0)
     }
+    
+    func testTransactionHasDefaultID() {
+        let transaction = Transaction(
+            amount: 100,
+            merchantName: "Test",
+            categoryName: "Test",
+            paymentMethod: .cash
+        )
+
+        XCTAssertNotEqual(transaction.id, UUID())
+    }
+
+    func testTransactionHasDefaultTimestamps() {
+        let before = Date()
+
+        let transaction = Transaction(
+            amount: 100,
+            merchantName: "Test",
+            categoryName: "Test",
+            paymentMethod: .cash
+        )
+
+        let after = Date()
+
+        XCTAssertGreaterThanOrEqual(transaction.createdAt, before)
+        XCTAssertLessThanOrEqual(transaction.createdAt, after)
+
+        XCTAssertGreaterThanOrEqual(transaction.updatedAt, before)
+        XCTAssertLessThanOrEqual(transaction.updatedAt, after)
+    }
+
+    func testTransactionSources() {
+        let quickAdd = Transaction(
+            amount: 100,
+            merchantName: "Quick",
+            categoryName: "Food",
+            paymentMethod: .cash,
+            source: .quickAdd
+        )
+
+        let ocr = Transaction(
+            amount: 200,
+            merchantName: "OCR",
+            categoryName: "Food",
+            paymentMethod: .cash,
+            source: .ocr
+        )
+
+        let ai = Transaction(
+            amount: 300,
+            merchantName: "AI",
+            categoryName: "Food",
+            paymentMethod: .cash,
+            source: .ai
+        )
+
+        XCTAssertEqual(quickAdd.source, .quickAdd)
+        XCTAssertEqual(ocr.source, .ocr)
+        XCTAssertEqual(ai.source, .ai)
+    }
 }
