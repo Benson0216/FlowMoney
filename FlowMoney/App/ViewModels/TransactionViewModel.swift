@@ -1,33 +1,42 @@
 //
-//  TransactionService.swift
+//  TransactionViewModel.swift
 //  FlowMoney
 //
-//  Created by Benson Lee on 2026/9/2.
+//  Created by Benson Lee on 2026/9/5.
 //
 
 import Foundation
+import Observation
 
-final class TransactionService: TransactionServiceProtocol {
+@MainActor
+@Observable
+final class TransactionViewModel {
 
-    private let repository: TransactionRepository
+    var transactions: [Transaction] = []
+    
+    private let service: TransactionServiceProtocol
 
-    init(repository: TransactionRepository) {
-        self.repository = repository
+    init(service: TransactionServiceProtocol) {
+        self.service = service
     }
-
-    func createTransaction(
+    
+    func loadTransactions() throws {
+        transactions = try service.fetchTransactions()
+    }
+    
+    func addTransaction(
         amount: Decimal,
-        currencyCode: String = "TWD",
-        type: TransactionType = .expense,
-        date: Date = .now,
+        currencyCode: String,
+        type: TransactionType,
+        date: Date,
         merchantName: String,
         categoryName: String,
-        category: Category? = nil,
+        category: Category?,
         paymentMethod: PaymentMethod,
-        note: String? = nil,
-        source: TransactionSource = .manual
-    ) throws -> Transaction {
-        try repository.create(
+        note: String?,
+        source: TransactionSource
+    ) throws {
+        let transaction = try service.createTransaction(
             amount: amount,
             currencyCode: currencyCode,
             type: type,
@@ -39,12 +48,10 @@ final class TransactionService: TransactionServiceProtocol {
             note: note,
             source: source
         )
-    }
 
-    func fetchTransactions() throws -> [Transaction] {
-        try repository.fetchAll()
+        transactions.append(transaction)
     }
-
+    
     func updateTransaction(
         _ transaction: Transaction,
         amount: Decimal,
@@ -58,7 +65,7 @@ final class TransactionService: TransactionServiceProtocol {
         note: String?,
         source: TransactionSource
     ) throws {
-        try repository.update(
+        try service.updateTransaction(
             transaction,
             amount: amount,
             currencyCode: currencyCode,
@@ -72,8 +79,10 @@ final class TransactionService: TransactionServiceProtocol {
             source: source
         )
     }
-
+    
     func deleteTransaction(_ transaction: Transaction) throws {
-        try repository.delete(transaction)
+        try service.deleteTransaction(transaction)
+
+        transactions.removeAll { $0.id == transaction.id }
     }
 }
