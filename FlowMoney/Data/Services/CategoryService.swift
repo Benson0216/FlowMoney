@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class CategoryService {
+final class CategoryService: CategoryServiceProtocol {
 
     private let repository: CategoryRepository
 
