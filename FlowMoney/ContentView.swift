@@ -6,19 +6,36 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
+
+    @Environment(\.modelContext) private var modelContext
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        let repository = TransactionRepository(
+            modelContext: modelContext
+        )
+        let service = TransactionService(
+            repository: repository
+        )
+        let viewModel = TransactionViewModel(
+            service: service
+        )
+
+        TransactionListView(
+            viewModel: viewModel
+        )
     }
 }
 
 #Preview {
     ContentView()
+        .modelContainer(
+            for: [
+                Transaction.self,
+                Category.self
+            ],
+            inMemory: true
+        )
 }
