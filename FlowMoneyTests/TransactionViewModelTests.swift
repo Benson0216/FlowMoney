@@ -265,4 +265,41 @@ final class TransactionViewModelTests: XCTestCase {
             "Test Merchant"
         )
     }
+    
+    func testUpdateTransactionUpdatesTransaction() throws {
+        let mockService = MockTransactionService()
+        let viewModel = TransactionViewModel(service: mockService)
+
+        let transaction = Transaction(
+            amount: 150,
+            currencyCode: "TWD",
+            type: .expense,
+            date: Date.now,
+            merchantName: "Coffee Shop",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .creditCard,
+            note: nil,
+            source: .manual
+        )
+
+        viewModel.transactions = [transaction]
+
+        try viewModel.updateTransaction(
+            transaction,
+            amount: 200,
+            currencyCode: "TWD",
+            type: .expense,
+            date: transaction.date,
+            merchantName: "Starbucks",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .creditCard,
+            note: nil,
+            source: .manual
+        )
+
+        XCTAssertEqual(transaction.amount, 200)
+        XCTAssertEqual(transaction.merchantName, "Starbucks")
+    }
 }

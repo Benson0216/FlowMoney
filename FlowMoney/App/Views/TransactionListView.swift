@@ -21,23 +21,30 @@ struct TransactionListView: View {
                     )
                 } else {
                     ForEach(viewModel.transactions) { transaction in
-                        VStack(alignment: .leading) {
-                            Text(transaction.merchantName)
-                            Text(transaction.categoryName)
-
-                            Text(transaction.amount.description)
-                                .foregroundStyle(
-                                    transaction.type == .income
-                                        ? .green
-                                        : .red
-                                )
-
-                            Text(
-                                transaction.date.formatted(
-                                    date: .abbreviated,
-                                    time: .omitted
-                                )
+                        NavigationLink {
+                            TransactionDetailView(
+                                transaction: transaction,
+                                viewModel: viewModel
                             )
+                        } label: {
+                            VStack(alignment: .leading) {
+                                Text(transaction.merchantName)
+                                Text(transaction.categoryName)
+
+                                Text(transaction.amount.description)
+                                    .foregroundStyle(
+                                        transaction.type == .income
+                                            ? .green
+                                            : .red
+                                    )
+
+                                Text(
+                                    transaction.date.formatted(
+                                        date: .abbreviated,
+                                        time: .omitted
+                                    )
+                                )
+                            }
                         }
                     }
                 }
