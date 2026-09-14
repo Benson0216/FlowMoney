@@ -16,15 +16,30 @@ struct ContentView: View {
         let repository = TransactionRepository(
             modelContext: modelContext
         )
+        
         let service = TransactionService(
             repository: repository
         )
+        
         let viewModel = TransactionViewModel(
             service: service
         )
+        
+        let categoryRepository = CategoryRepository(
+            modelContext: modelContext
+        )
+
+        let categoryService = CategoryService(
+            repository: categoryRepository
+        )
+
+        let categoryViewModel = CategoryViewModel(
+            service: categoryService
+        )
 
         TransactionListView(
-            viewModel: viewModel
+            viewModel: viewModel,
+            categoryViewModel: categoryViewModel
         )
     }
 }
