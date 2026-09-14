@@ -16,7 +16,15 @@ final class TransactionListViewTests: XCTestCase {
         let mockService = MockTransactionService()
         let viewModel = TransactionViewModel(service: mockService)
 
-        let view = TransactionListView(viewModel: viewModel)
+        let mockCategoryService = MockCategoryService()
+        let categoryViewModel = CategoryViewModel(
+            service: mockCategoryService
+        )
+
+        let view = TransactionListView(
+            viewModel: viewModel,
+            categoryViewModel: categoryViewModel
+        )
 
         XCTAssertNotNil(view)
     }

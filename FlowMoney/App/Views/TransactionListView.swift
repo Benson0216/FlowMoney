@@ -10,6 +10,7 @@ import SwiftUI
 struct TransactionListView: View {
 
     let viewModel: TransactionViewModel
+    let categoryViewModel: CategoryViewModel
 
     var body: some View {
         NavigationStack {
@@ -51,6 +52,16 @@ struct TransactionListView: View {
             }
             .navigationTitle("Transactions")
             .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        CategoryListView(
+                            viewModel: categoryViewModel
+                        )
+                    } label: {
+                        Image(systemName: "folder")
+                    }
+                }
+
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
                         AddTransactionView(
