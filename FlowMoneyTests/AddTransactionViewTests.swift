@@ -15,8 +15,12 @@ final class AddTransactionViewTests: XCTestCase {
         let mockService = MockTransactionService()
         let viewModel = TransactionViewModel(service: mockService)
 
+        let categoryService = MockCategoryService()
+        let categoryViewModel = CategoryViewModel(service: categoryService)
+
         let view = AddTransactionView(
-            viewModel: viewModel
+            viewModel: viewModel,
+            categoryViewModel: categoryViewModel
         )
 
         XCTAssertNotNil(view)
@@ -47,6 +51,36 @@ final class AddTransactionViewTests: XCTestCase {
         XCTAssertEqual(
             viewModel.transactions.first?.amount,
             150
+        )
+    }
+
+    func testViewModelCanAddTransactionWithCategory() throws {
+        let mockService = MockTransactionService()
+        let viewModel = TransactionViewModel(service: mockService)
+
+        let category = Category(
+            name: "Food",
+            icon: "fork.knife",
+            type: .expense
+        )
+
+        try viewModel.addTransaction(
+            amount: 200,
+            currencyCode: "TWD",
+            type: .expense,
+            date: Date.now,
+            merchantName: "Lunch",
+            categoryName: "Food",
+            category: category,
+            paymentMethod: .creditCard,
+            note: nil,
+            source: .manual
+        )
+
+        XCTAssertEqual(viewModel.transactions.count, 1)
+        XCTAssertEqual(
+            viewModel.transactions.first?.category?.name,
+            "Food"
         )
     }
 }

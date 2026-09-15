@@ -65,7 +65,8 @@ struct TransactionListView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
                         AddTransactionView(
-                            viewModel: viewModel
+                            viewModel: viewModel,
+                            categoryViewModel: categoryViewModel
                         )
                     } label: {
                         Image(systemName: "plus")
