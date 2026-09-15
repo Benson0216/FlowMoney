@@ -10,12 +10,14 @@ import SwiftUI
 struct AddTransactionView: View {
 
     let viewModel: TransactionViewModel
+    let categoryViewModel: CategoryViewModel
 
     @Environment(\.dismiss) private var dismiss
 
     @State private var amount = ""
     @State private var merchantName = ""
     @State private var categoryName = ""
+    @State private var selectedCategory: Category?
     @State private var paymentMethod: PaymentMethod = .creditCard
     @State private var note = ""
     @State private var date = Date.now
@@ -48,10 +50,15 @@ struct AddTransactionView: View {
                     text: $merchantName
                 )
 
-                TextField(
-                    "Category",
-                    text: $categoryName
-                )
+                Picker("Category", selection: $selectedCategory) {
+                    Text("None")
+                        .tag(nil as Category?)
+
+                    ForEach(categoryViewModel.categories) { category in
+                        Text(category.name)
+                            .tag(category as Category?)
+                    }
+                }
 
                 Picker(
                     "Payment Method",
@@ -89,6 +96,13 @@ struct AddTransactionView: View {
             }
         }
         .navigationTitle("Add Transaction")
+        .task {
+            do {
+                try categoryViewModel.loadCategories()
+            } catch {
+                print("Failed to load categories:", error)
+            }
+        }
     }
 
     private func saveTransaction() {
@@ -103,8 +117,8 @@ struct AddTransactionView: View {
                 type: type,
                 date: date,
                 merchantName: merchantName,
-                categoryName: categoryName,
-                category: nil,
+                categoryName: selectedCategory?.name ?? "",
+                category: selectedCategory,
                 paymentMethod: paymentMethod,
                 note: note.isEmpty ? nil : note,
                 source: .manual
