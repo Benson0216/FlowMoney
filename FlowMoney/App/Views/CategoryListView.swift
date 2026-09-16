@@ -33,6 +33,15 @@ struct CategoryListView: View {
                 }
             }
             .navigationTitle("Categories")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        CategoryCreationView(viewModel: viewModel)
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
             .task {
                 try? viewModel.loadCategories()
             }
