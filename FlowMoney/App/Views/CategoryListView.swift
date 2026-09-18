@@ -21,13 +21,20 @@ struct CategoryListView: View {
                     )
                 } else {
                     ForEach(viewModel.categories) { category in
-                        VStack(alignment: .leading) {
-                            Text(category.name)
-                            Text(
-                                category.type == .income
-                                    ? "Income"
-                                    : "Expense"
+                        NavigationLink {
+                            CategoryEditingView(
+                                category: category,
+                                viewModel: viewModel
                             )
+                        } label: {
+                            VStack(alignment: .leading) {
+                                Text(category.name)
+                                Text(
+                                    category.type == .income
+                                        ? "Income"
+                                        : "Expense"
+                                )
+                            }
                         }
                     }
                 }
