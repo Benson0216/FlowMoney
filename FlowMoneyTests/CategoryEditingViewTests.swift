@@ -59,4 +59,21 @@ final class CategoryEditingViewTests: XCTestCase {
         XCTAssertEqual(existingCategory.icon, "car.fill")
         XCTAssertEqual(existingCategory.type, .expense)
     }
+
+    func testDeleteCategoryRemovesCategory() throws {
+        let mockService = MockCategoryService()
+        let viewModel = CategoryViewModel(service: mockService)
+
+        try viewModel.addCategory(
+            name: "Food",
+            icon: "fork.knife",
+            type: .expense
+        )
+
+        let category = try XCTUnwrap(viewModel.categories.first)
+
+        try viewModel.deleteCategory(category)
+
+        XCTAssertTrue(viewModel.categories.isEmpty)
+    }
 }

@@ -37,6 +37,17 @@ struct CategoryListView: View {
                             }
                         }
                     }
+                    .onDelete { indexSet in
+                        for index in indexSet {
+                            let category = viewModel.categories[index]
+
+                            do {
+                                try viewModel.deleteCategory(category)
+                            } catch {
+                                // Error handling will be added later.
+                            }
+                        }
+                    }
                 }
             }
             .navigationTitle("Categories")
