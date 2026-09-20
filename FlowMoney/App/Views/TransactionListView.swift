@@ -48,6 +48,17 @@ struct TransactionListView: View {
                             }
                         }
                     }
+                    .onDelete { indexSet in
+                        for index in indexSet {
+                            let transaction = viewModel.transactions[index]
+
+                            do {
+                                try viewModel.deleteTransaction(transaction)
+                            } catch {
+                                // Error handling will be added later.
+                            }
+                        }
+                    }
                 }
             }
             .navigationTitle("Transactions")

@@ -302,4 +302,28 @@ final class TransactionViewModelTests: XCTestCase {
         XCTAssertEqual(transaction.amount, 200)
         XCTAssertEqual(transaction.merchantName, "Starbucks")
     }
+
+    func testDeleteTransactionRemovesTransaction() throws {
+        let mockService = MockTransactionService()
+        let viewModel = TransactionViewModel(service: mockService)
+
+        try viewModel.addTransaction(
+            amount: 100,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Test Store",
+            categoryName: "",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        let transaction = try XCTUnwrap(viewModel.transactions.first)
+
+        try viewModel.deleteTransaction(transaction)
+
+        XCTAssertTrue(viewModel.transactions.isEmpty)
+    }
 }
