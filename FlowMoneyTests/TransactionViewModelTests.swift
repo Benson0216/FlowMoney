@@ -326,4 +326,58 @@ final class TransactionViewModelTests: XCTestCase {
 
         XCTAssertTrue(viewModel.transactions.isEmpty)
     }
+    
+    func testFilterTransactionsByType() throws {
+        let mockService = MockTransactionService()
+        let viewModel = TransactionViewModel(service: mockService)
+
+        let income = Transaction(
+            amount: 1000,
+            currencyCode: "TWD",
+            type: .income,
+            date: .now,
+            merchantName: "Salary",
+            categoryName: "Income",
+            category: nil,
+            paymentMethod: .bankTransfer,
+            note: nil,
+            source: .manual
+        )
+
+        let expense = Transaction(
+            amount: 200,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Coffee Shop",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .creditCard,
+            note: nil,
+            source: .manual
+        )
+
+        let transfer = Transaction(
+            amount: 500,
+            currencyCode: "TWD",
+            type: .transfer,
+            date: .now,
+            merchantName: "Bank Transfer",
+            categoryName: "Transfer",
+            category: nil,
+            paymentMethod: .bankTransfer,
+            note: nil,
+            source: .manual
+        )
+
+        viewModel.transactions = [income, expense, transfer]
+
+        viewModel.selectedFilter = .expense
+
+        XCTAssertEqual(viewModel.filteredTransactions.count, 1)
+        XCTAssertEqual(
+            viewModel.filteredTransactions.first?.merchantName,
+            "Coffee Shop"
+        )
+    }
 }

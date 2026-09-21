@@ -21,7 +21,7 @@ struct TransactionListView: View {
                         systemImage: "tray"
                     )
                 } else {
-                    ForEach(viewModel.transactions) { transaction in
+                    ForEach(viewModel.filteredTransactions) { transaction in
                         NavigationLink {
                             TransactionDetailView(
                                 transaction: transaction,
@@ -63,6 +63,19 @@ struct TransactionListView: View {
             }
             .navigationTitle("Transactions")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Picker("Filter", selection: Binding(
+                        get: { viewModel.selectedFilter },
+                        set: { viewModel.selectedFilter = $0 }
+                    )) {
+                        Text("All").tag(TransactionFilter.all)
+                        Text("Income").tag(TransactionFilter.income)
+                        Text("Expense").tag(TransactionFilter.expense)
+                        Text("Transfer").tag(TransactionFilter.transfer)
+                    }
+                    .pickerStyle(.menu)
+                }
+                
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
                         CategoryListView(

@@ -8,11 +8,32 @@
 import Foundation
 import Observation
 
+enum TransactionFilter {
+    case all
+    case income
+    case expense
+    case transfer
+}
+
 @MainActor
 @Observable
 final class TransactionViewModel {
 
     var transactions: [Transaction] = []
+    var selectedFilter: TransactionFilter = .all
+    
+    var filteredTransactions: [Transaction] {
+        switch selectedFilter {
+        case .all:
+            transactions
+        case .income:
+            transactions.filter { $0.type == .income }
+        case .expense:
+            transactions.filter { $0.type == .expense }
+        case .transfer:
+            transactions.filter { $0.type == .transfer }
+        }
+    }
     
     private let service: TransactionServiceProtocol
 
