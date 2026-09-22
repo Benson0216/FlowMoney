@@ -380,4 +380,54 @@ final class TransactionViewModelTests: XCTestCase {
             "Coffee Shop"
         )
     }
+
+    func testSortTransactionsByDate() throws {
+        let mockService = MockTransactionService()
+        let viewModel = TransactionViewModel(service: mockService)
+
+        let olderTransaction = Transaction(
+            amount: 100,
+            currencyCode: "TWD",
+            type: .expense,
+            date: Date(timeIntervalSince1970: 1_000),
+            merchantName: "Older",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        let newerTransaction = Transaction(
+            amount: 200,
+            currencyCode: "TWD",
+            type: .expense,
+            date: Date(timeIntervalSince1970: 2_000),
+            merchantName: "Newer",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        viewModel.transactions = [
+            olderTransaction,
+            newerTransaction
+        ]
+
+        viewModel.sortOption = .newestFirst
+
+        XCTAssertEqual(
+            viewModel.sortedTransactions.first?.merchantName,
+            "Newer"
+        )
+
+        viewModel.sortOption = .oldestFirst
+
+        XCTAssertEqual(
+            viewModel.sortedTransactions.first?.merchantName,
+            "Older"
+        )
+    }
 }
