@@ -15,12 +15,18 @@ enum TransactionFilter {
     case transfer
 }
 
+enum TransactionSortOption {
+    case newestFirst
+    case oldestFirst
+}
+
 @MainActor
 @Observable
 final class TransactionViewModel {
 
     var transactions: [Transaction] = []
     var selectedFilter: TransactionFilter = .all
+    var sortOption: TransactionSortOption = .newestFirst
     
     var filteredTransactions: [Transaction] {
         switch selectedFilter {
@@ -32,6 +38,15 @@ final class TransactionViewModel {
             transactions.filter { $0.type == .expense }
         case .transfer:
             transactions.filter { $0.type == .transfer }
+        }
+    }
+    
+    var sortedTransactions: [Transaction] {
+        switch sortOption {
+        case .newestFirst:
+            filteredTransactions.sorted { $0.date > $1.date }
+        case .oldestFirst:
+            filteredTransactions.sorted { $0.date < $1.date }
         }
     }
     

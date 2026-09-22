@@ -21,7 +21,7 @@ struct TransactionListView: View {
                         systemImage: "tray"
                     )
                 } else {
-                    ForEach(viewModel.filteredTransactions) { transaction in
+                    ForEach(viewModel.sortedTransactions) { transaction in
                         NavigationLink {
                             TransactionDetailView(
                                 transaction: transaction,
@@ -95,6 +95,17 @@ struct TransactionListView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                }
+                
+                ToolbarItem(placement: .topBarLeading) {
+                    Picker("Sort", selection: Binding(
+                        get: { viewModel.sortOption },
+                        set: { viewModel.sortOption = $0 }
+                    )) {
+                        Text("Newest").tag(TransactionSortOption.newestFirst)
+                        Text("Oldest").tag(TransactionSortOption.oldestFirst)
+                    }
+                    .pickerStyle(.menu)
                 }
             }
             .task {
