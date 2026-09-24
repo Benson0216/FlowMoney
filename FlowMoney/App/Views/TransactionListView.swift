@@ -107,6 +107,19 @@ struct TransactionListView: View {
                     }
                     .pickerStyle(.menu)
                 }
+
+                ToolbarItem(placement: .topBarLeading) {
+                    Picker("Date", selection: Binding(
+                        get: { viewModel.dateFilter },
+                        set: { viewModel.dateFilter = $0 }
+                    )) {
+                        Text("All").tag(TransactionDateFilter.all)
+                        Text("Today").tag(TransactionDateFilter.today)
+                        Text("This Week").tag(TransactionDateFilter.thisWeek)
+                        Text("This Month").tag(TransactionDateFilter.thisMonth)
+                    }
+                    .pickerStyle(.menu)
+                }
             }
             .task {
                 try? viewModel.loadTransactions()

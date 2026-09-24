@@ -430,4 +430,94 @@ final class TransactionViewModelTests: XCTestCase {
             "Older"
         )
     }
+
+    func testFilterTransactionsByDateRange() throws {
+        let mockService = MockTransactionService()
+        let viewModel = TransactionViewModel(service: mockService)
+
+        let calendar = Calendar.current
+        let now = Date()
+
+        let today = calendar.startOfDay(for: now)
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+        let lastMonth = calendar.date(byAdding: .month, value: -1, to: today)!
+
+        let todayTransaction = Transaction(
+            amount: 100,
+            currencyCode: "TWD",
+            type: .expense,
+            date: now,
+            merchantName: "Today",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        let yesterdayTransaction = Transaction(
+            amount: 200,
+            currencyCode: "TWD",
+            type: .expense,
+            date: yesterday,
+            merchantName: "Yesterday",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        let lastMonthTransaction = Transaction(
+            amount: 300,
+            currencyCode: "TWD",
+            type: .expense,
+            date: lastMonth,
+            merchantName: "Last Month",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        viewModel.transactions = [
+            todayTransaction,
+            yesterdayTransaction,
+            lastMonthTransaction
+        ]
+
+        viewModel.dateFilter = .today
+
+        XCTAssertEqual(
+            viewModel.dateFilteredTransactions.count,
+            1
+        )
+
+        XCTAssertEqual(
+            viewModel.dateFilteredTransactions.first?.merchantName,
+            "Today"
+        )
+
+        viewModel.dateFilter = .all
+
+        XCTAssertEqual(
+            viewModel.dateFilteredTransactions.count,
+            3
+        )
+
+        viewModel.dateFilter = .thisWeek
+
+        XCTAssertEqual(
+            viewModel.dateFilteredTransactions.count,
+            2
+        )
+
+        viewModel.dateFilter = .thisMonth
+
+        XCTAssertEqual(
+            viewModel.dateFilteredTransactions.count,
+            2
+        )
+    }
 }
