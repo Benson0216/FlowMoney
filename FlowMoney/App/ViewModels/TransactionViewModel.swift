@@ -20,6 +20,13 @@ enum TransactionSortOption {
     case oldestFirst
 }
 
+enum TransactionDateFilter {
+    case all
+    case today
+    case thisWeek
+    case thisMonth
+}
+
 @MainActor
 @Observable
 final class TransactionViewModel {
@@ -27,6 +34,7 @@ final class TransactionViewModel {
     var transactions: [Transaction] = []
     var selectedFilter: TransactionFilter = .all
     var sortOption: TransactionSortOption = .newestFirst
+    var dateFilter: TransactionDateFilter = .all
     
     var filteredTransactions: [Transaction] {
         switch selectedFilter {
@@ -40,13 +48,53 @@ final class TransactionViewModel {
             transactions.filter { $0.type == .transfer }
         }
     }
-    
+
+    var dateFilteredTransactions: [Transaction] {
+        let calendar = Calendar.current
+        let now = Date()
+        let sourceTransactions = filteredTransactions
+
+        switch dateFilter {
+        case .all:
+            return sourceTransactions
+
+        case .today:
+            return sourceTransactions.filter {
+                calendar.isDate($0.date, inSameDayAs: now)
+            }
+
+        case .thisWeek:
+            guard let weekInterval = calendar.dateInterval(
+                of: .weekOfYear,
+                for: now
+            ) else {
+                return sourceTransactions
+            }
+
+            return sourceTransactions.filter {
+                weekInterval.contains($0.date)
+            }
+
+        case .thisMonth:
+            guard let monthInterval = calendar.dateInterval(
+                of: .month,
+                for: now
+            ) else {
+                return sourceTransactions
+            }
+
+            return sourceTransactions.filter {
+                monthInterval.contains($0.date)
+            }
+        }
+    }
+
     var sortedTransactions: [Transaction] {
         switch sortOption {
         case .newestFirst:
-            filteredTransactions.sorted { $0.date > $1.date }
+            dateFilteredTransactions.sorted { $0.date > $1.date }
         case .oldestFirst:
-            filteredTransactions.sorted { $0.date < $1.date }
+            dateFilteredTransactions.sorted { $0.date < $1.date }
         }
     }
     
