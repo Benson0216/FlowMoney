@@ -63,19 +63,6 @@ struct TransactionListView: View {
             }
             .navigationTitle("Transactions")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Picker("Filter", selection: Binding(
-                        get: { viewModel.selectedFilter },
-                        set: { viewModel.selectedFilter = $0 }
-                    )) {
-                        Text("All").tag(TransactionFilter.all)
-                        Text("Income").tag(TransactionFilter.income)
-                        Text("Expense").tag(TransactionFilter.expense)
-                        Text("Transfer").tag(TransactionFilter.transfer)
-                    }
-                    .pickerStyle(.menu)
-                }
-                
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
                         CategoryListView(
@@ -96,36 +83,18 @@ struct TransactionListView: View {
                         Image(systemName: "plus")
                     }
                 }
-                
-                ToolbarItem(placement: .topBarLeading) {
-                    Picker("Sort", selection: Binding(
-                        get: { viewModel.sortOption },
-                        set: { viewModel.sortOption = $0 }
-                    )) {
-                        Text("Newest").tag(TransactionSortOption.newestFirst)
-                        Text("Oldest").tag(TransactionSortOption.oldestFirst)
-                    }
-                    .pickerStyle(.menu)
-                }
-
-                ToolbarItem(placement: .topBarLeading) {
-                    Picker("Date", selection: Binding(
-                        get: { viewModel.dateFilter },
-                        set: { viewModel.dateFilter = $0 }
-                    )) {
-                        Text("All").tag(TransactionDateFilter.all)
-                        Text("Today").tag(TransactionDateFilter.today)
-                        Text("This Week").tag(TransactionDateFilter.thisWeek)
-                        Text("This Month").tag(TransactionDateFilter.thisMonth)
-                    }
-                    .pickerStyle(.menu)
-                }
             }
             .task {
                 try? viewModel.loadTransactions()
             }
         }
+        .searchable(
+            text: Binding(
+                get: { viewModel.searchText },
+                set: { viewModel.searchText = $0 }
+            ),
+            placement: .navigationBarDrawer(displayMode: .always),
+            prompt: "Search transactions"
+        )
     }
 }
-
-

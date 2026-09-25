@@ -89,12 +89,27 @@ final class TransactionViewModel {
         }
     }
 
+    var searchText = ""
+
+    var searchFilteredTransactions: [Transaction] {
+        let keyword = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !keyword.isEmpty else {
+            return dateFilteredTransactions
+        }
+
+        return dateFilteredTransactions.filter { transaction in
+            transaction.merchantName.localizedCaseInsensitiveContains(keyword)
+            || transaction.categoryName.localizedCaseInsensitiveContains(keyword)
+        }
+    }
+
     var sortedTransactions: [Transaction] {
         switch sortOption {
         case .newestFirst:
-            dateFilteredTransactions.sorted { $0.date > $1.date }
+            searchFilteredTransactions.sorted { $0.date > $1.date }
         case .oldestFirst:
-            dateFilteredTransactions.sorted { $0.date < $1.date }
+            searchFilteredTransactions.sorted { $0.date < $1.date }
         }
     }
     

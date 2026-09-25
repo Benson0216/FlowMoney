@@ -520,4 +520,80 @@ final class TransactionViewModelTests: XCTestCase {
             2
         )
     }
+
+    func testSearchTransactionsByKeyword() throws {
+        let mockService = MockTransactionService()
+        let viewModel = TransactionViewModel(service: mockService)
+
+        let coffeeTransaction = Transaction(
+            amount: 100,
+            currencyCode: "TWD",
+            type: .expense,
+            date: Date(),
+            merchantName: "Coffee Shop",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        let foodTransaction = Transaction(
+            amount: 300,
+            currencyCode: "TWD",
+            type: .expense,
+            date: Date(),
+            merchantName: "Restaurant",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        let supermarketTransaction = Transaction(
+            amount: 500,
+            currencyCode: "TWD",
+            type: .expense,
+            date: Date(),
+            merchantName: "Supermarket",
+            categoryName: "Shopping",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        viewModel.transactions = [
+            coffeeTransaction,
+            supermarketTransaction,
+            foodTransaction
+        ]
+
+        viewModel.searchText = "Coffee"
+
+        XCTAssertEqual(
+            viewModel.searchFilteredTransactions.count,
+            1
+        )
+
+        XCTAssertEqual(
+            viewModel.searchFilteredTransactions.first?.merchantName,
+            "Coffee Shop"
+        )
+
+        viewModel.searchText = "Food"
+
+        XCTAssertEqual(
+            viewModel.searchFilteredTransactions.count,
+            2
+        )
+
+        viewModel.searchText = ""
+
+        XCTAssertEqual(
+            viewModel.searchFilteredTransactions.count,
+            3
+        )
+    }
 }
