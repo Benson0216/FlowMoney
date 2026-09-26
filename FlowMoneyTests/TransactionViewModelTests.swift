@@ -596,4 +596,67 @@ final class TransactionViewModelTests: XCTestCase {
             3
         )
     }
+
+    @MainActor
+    func testSearchWorksWithExistingFilters() throws {
+        let mockService = MockTransactionService()
+
+        let foodTransaction = Transaction(
+            amount: 100,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Coffee Shop",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .creditCard,
+            note: nil,
+            source: .manual
+        )
+
+        let shoppingTransaction = Transaction(
+            amount: 200,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Supermarket",
+            categoryName: "Shopping",
+            category: nil,
+            paymentMethod: .creditCard,
+            note: nil,
+            source: .manual
+        )
+
+        let incomeTransaction = Transaction(
+            amount: 500,
+            currencyCode: "TWD",
+            type: .income,
+            date: .now,
+            merchantName: "Salary",
+            categoryName: "Income",
+            category: nil,
+            paymentMethod: .bankTransfer,
+            note: nil,
+            source: .manual
+        )
+
+        mockService.transactions = [
+            foodTransaction,
+            shoppingTransaction,
+            incomeTransaction
+        ]
+
+        let viewModel = TransactionViewModel(service: mockService)
+
+        try viewModel.loadTransactions()
+
+        viewModel.selectedFilter = .expense
+        viewModel.searchText = "Food"
+
+        XCTAssertEqual(viewModel.sortedTransactions.count, 1)
+        XCTAssertEqual(
+            viewModel.sortedTransactions.first?.merchantName,
+            "Coffee Shop"
+        )
+    }
 }
