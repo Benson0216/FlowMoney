@@ -659,4 +659,63 @@ final class TransactionViewModelTests: XCTestCase {
             "Coffee Shop"
         )
     }
+
+    @MainActor
+    func testDashboardStatistics() throws {
+        let mockService = MockTransactionService()
+
+        let incomeTransaction = Transaction(
+            amount: 5000,
+            currencyCode: "TWD",
+            type: .income,
+            date: .now,
+            merchantName: "Salary",
+            categoryName: "Income",
+            category: nil,
+            paymentMethod: .bankTransfer,
+            note: nil,
+            source: .manual
+        )
+
+        let expenseTransaction = Transaction(
+            amount: 1200,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Supermarket",
+            categoryName: "Shopping",
+            category: nil,
+            paymentMethod: .creditCard,
+            note: nil,
+            source: .manual
+        )
+
+        let anotherExpenseTransaction = Transaction(
+            amount: 300,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Coffee Shop",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .applePay,
+            note: nil,
+            source: .manual
+        )
+
+        mockService.transactions = [
+            incomeTransaction,
+            expenseTransaction,
+            anotherExpenseTransaction
+        ]
+
+        let viewModel = TransactionViewModel(service: mockService)
+
+        try viewModel.loadTransactions()
+
+        XCTAssertEqual(viewModel.totalIncome, 5000)
+        XCTAssertEqual(viewModel.totalExpense, 1500)
+        XCTAssertEqual(viewModel.netAmount, 3500)
+        XCTAssertEqual(viewModel.transactionCount, 3)
+    }
 }

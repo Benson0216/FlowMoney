@@ -35,7 +35,26 @@ final class TransactionViewModel {
     var selectedFilter: TransactionFilter = .all
     var sortOption: TransactionSortOption = .newestFirst
     var dateFilter: TransactionDateFilter = .all
-    
+    var totalIncome: Decimal {
+        transactions
+            .filter { $0.type == .income }
+            .reduce(0) { $0 + $1.amount }
+    }
+
+    var totalExpense: Decimal {
+        transactions
+            .filter { $0.type == .expense }
+            .reduce(0) { $0 + $1.amount }
+    }
+
+    var netAmount: Decimal {
+        totalIncome - totalExpense
+    }
+
+    var transactionCount: Int {
+        transactions.count
+    }
+
     var filteredTransactions: [Transaction] {
         switch selectedFilter {
         case .all:
