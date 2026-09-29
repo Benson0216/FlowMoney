@@ -55,6 +55,14 @@ final class TransactionViewModel {
         transactions.count
     }
 
+    var categorySpendingBreakdown: [String: Decimal] {
+        transactions
+            .filter { $0.type == .expense }
+            .reduce(into: [:]) { result, transaction in
+                result[transaction.categoryName, default: 0] += transaction.amount
+            }
+    }
+
     var filteredTransactions: [Transaction] {
         switch selectedFilter {
         case .all:
