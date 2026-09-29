@@ -110,6 +110,14 @@ struct TransactionListView: View {
                     }
                 }
 
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink {
+                        DashboardView(viewModel: viewModel)
+                    } label: {
+                        Image(systemName: "chart.bar")
+                    }
+                }
+
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
                         CategoryListView(

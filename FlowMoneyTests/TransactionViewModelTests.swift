@@ -718,4 +718,76 @@ final class TransactionViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.netAmount, 3500)
         XCTAssertEqual(viewModel.transactionCount, 3)
     }
+
+    @MainActor
+    func testCategorySpendingBreakdown() throws {
+        let mockService = MockTransactionService()
+
+        let foodTransaction = Transaction(
+            amount: 300,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Coffee Shop",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        let anotherFoodTransaction = Transaction(
+            amount: 500,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Restaurant",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .creditCard,
+            note: nil,
+            source: .manual
+        )
+
+        let shoppingTransaction = Transaction(
+            amount: 1000,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Supermarket",
+            categoryName: "Shopping",
+            category: nil,
+            paymentMethod: .creditCard,
+            note: nil,
+            source: .manual
+        )
+
+        let incomeTransaction = Transaction(
+            amount: 5000,
+            currencyCode: "TWD",
+            type: .income,
+            date: .now,
+            merchantName: "Salary",
+            categoryName: "Income",
+            category: nil,
+            paymentMethod: .bankTransfer,
+            note: nil,
+            source: .manual
+        )
+
+        mockService.transactions = [
+            foodTransaction,
+            anotherFoodTransaction,
+            shoppingTransaction,
+            incomeTransaction
+        ]
+
+        let viewModel = TransactionViewModel(service: mockService)
+
+        try viewModel.loadTransactions()
+
+        XCTAssertEqual(viewModel.categorySpendingBreakdown["Food"], 800)
+        XCTAssertEqual(viewModel.categorySpendingBreakdown["Shopping"], 1000)
+        XCTAssertNil(viewModel.categorySpendingBreakdown["Income"])
+    }
 }
