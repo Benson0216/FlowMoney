@@ -27,6 +27,11 @@ enum TransactionDateFilter {
     case thisMonth
 }
 
+struct MonthlyTransactionSummary {
+    let income: Decimal
+    let expense: Decimal
+}
+
 @MainActor
 @Observable
 final class TransactionViewModel {
@@ -61,6 +66,41 @@ final class TransactionViewModel {
             .reduce(into: [:]) { result, transaction in
                 result[transaction.categoryName, default: 0] += transaction.amount
             }
+    }
+
+    var monthlyTransactionTrend: [Date: MonthlyTransactionSummary] {
+        transactions.reduce(into: [:]) { result, transaction in
+            let components = Calendar.current.dateComponents(
+                [.year, .month],
+                from: transaction.date
+            )
+
+            guard let month = Calendar.current.date(from: components) else {
+                return
+            }
+
+            var summary = result[month] ?? MonthlyTransactionSummary(
+                income: 0,
+                expense: 0
+            )
+
+            switch transaction.type {
+            case .income:
+                summary = MonthlyTransactionSummary(
+                    income: summary.income + transaction.amount,
+                    expense: summary.expense
+                )
+            case .expense:
+                summary = MonthlyTransactionSummary(
+                    income: summary.income,
+                    expense: summary.expense + transaction.amount
+                )
+            case .transfer:
+                break
+            }
+
+            result[month] = summary
+        }
     }
 
     var filteredTransactions: [Transaction] {

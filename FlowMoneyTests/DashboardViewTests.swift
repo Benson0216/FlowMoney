@@ -50,4 +50,46 @@ final class DashboardViewTests: XCTestCase {
 
         XCTAssertNotNil(view)
     }
+
+    func testDashboardViewDisplaysMonthlyTransactionTrend() throws {
+        let mockService = MockTransactionService()
+
+        let transaction = Transaction(
+            amount: 1500,
+            currencyCode: "TWD",
+            type: .expense,
+            date: Calendar.current.date(
+                from: DateComponents(year: 2026, month: 9, day: 15)
+            )!,
+            merchantName: "Restaurant",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        mockService.transactions = [transaction]
+
+        let viewModel = TransactionViewModel(service: mockService)
+        try viewModel.loadTransactions()
+
+        let view = DashboardView(viewModel: viewModel)
+
+        let month = Calendar.current.date(
+            from: DateComponents(year: 2026, month: 9)
+        )!
+
+        XCTAssertEqual(
+            viewModel.monthlyTransactionTrend[month]?.expense,
+            1500
+        )
+
+        XCTAssertEqual(
+            viewModel.monthlyTransactionTrend[month]?.income,
+            0
+        )
+
+        XCTAssertNotNil(view)
+    }
 }

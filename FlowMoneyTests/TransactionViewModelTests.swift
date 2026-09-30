@@ -790,4 +790,124 @@ final class TransactionViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.categorySpendingBreakdown["Shopping"], 1000)
         XCTAssertNil(viewModel.categorySpendingBreakdown["Income"])
     }
+    
+    @MainActor
+    func testMonthlyTransactionTrend() throws {
+        let mockService = MockTransactionService()
+
+        let septemberIncome = Transaction(
+            amount: 5000,
+            currencyCode: "TWD",
+            type: .income,
+            date: Calendar.current.date(
+                from: DateComponents(year: 2026, month: 9, day: 10)
+            )!,
+            merchantName: "Salary",
+            categoryName: "Income",
+            category: nil,
+            paymentMethod: .bankTransfer,
+            note: nil,
+            source: .manual
+        )
+
+        let septemberExpense = Transaction(
+            amount: 1000,
+            currencyCode: "TWD",
+            type: .expense,
+            date: Calendar.current.date(
+                from: DateComponents(year: 2026, month: 9, day: 15)
+            )!,
+            merchantName: "Restaurant",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        let anotherSeptemberExpense = Transaction(
+            amount: 500,
+            currencyCode: "TWD",
+            type: .expense,
+            date: Calendar.current.date(
+                from: DateComponents(year: 2026, month: 9, day: 20)
+            )!,
+            merchantName: "Supermarket",
+            categoryName: "Shopping",
+            category: nil,
+            paymentMethod: .creditCard,
+            note: nil,
+            source: .manual
+        )
+
+        let augustExpense = Transaction(
+            amount: 1000,
+            currencyCode: "TWD",
+            type: .expense,
+            date: Calendar.current.date(
+                from: DateComponents(year: 2026, month: 8, day: 20)
+            )!,
+            merchantName: "Restaurant",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        let transfer = Transaction(
+            amount: 3000,
+            currencyCode: "TWD",
+            type: .transfer,
+            date: Calendar.current.date(
+                from: DateComponents(year: 2026, month: 9, day: 25)
+            )!,
+            merchantName: "Transfer",
+            categoryName: "Transfer",
+            category: nil,
+            paymentMethod: .bankTransfer,
+            note: nil,
+            source: .manual
+        )
+
+        mockService.transactions = [
+            septemberIncome,
+            septemberExpense,
+            anotherSeptemberExpense,
+            augustExpense,
+            transfer
+        ]
+
+        let viewModel = TransactionViewModel(service: mockService)
+
+        try viewModel.loadTransactions()
+
+        XCTAssertEqual(
+            viewModel.monthlyTransactionTrend[Calendar.current.date(
+                from: DateComponents(year: 2026, month: 9)
+            )!]?.income,
+            5000
+        )
+
+        XCTAssertEqual(
+            viewModel.monthlyTransactionTrend[Calendar.current.date(
+                from: DateComponents(year: 2026, month: 9)
+            )!]?.expense,
+            1500
+        )
+
+        XCTAssertEqual(
+            viewModel.monthlyTransactionTrend[Calendar.current.date(
+                from: DateComponents(year: 2026, month: 8)
+            )!]?.income,
+            0
+        )
+
+        XCTAssertEqual(
+            viewModel.monthlyTransactionTrend[Calendar.current.date(
+                from: DateComponents(year: 2026, month: 8)
+            )!]?.expense,
+            1000
+        )
+    }
 }
