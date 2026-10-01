@@ -910,4 +910,113 @@ final class TransactionViewModelTests: XCTestCase {
             1000
         )
     }
+    
+    @MainActor
+    func testFilteredTransactionsByCategory() throws {
+        let mockService = MockTransactionService()
+
+        let foodTransaction = Transaction(
+            amount: 1000,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Restaurant",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        let shoppingTransaction = Transaction(
+            amount: 2000,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Department Store",
+            categoryName: "Shopping",
+            category: nil,
+            paymentMethod: .creditCard,
+            note: nil,
+            source: .manual
+        )
+
+        mockService.transactions = [
+            foodTransaction,
+            shoppingTransaction
+        ]
+
+        let viewModel = TransactionViewModel(service: mockService)
+
+        try viewModel.loadTransactions()
+
+        viewModel.selectedCategory = "Food"
+
+        XCTAssertEqual(
+            viewModel.filteredTransactions,
+            [foodTransaction]
+        )
+    }
+    
+    @MainActor
+    func testFilteredTransactionsByTypeAndCategory() throws {
+        let mockService = MockTransactionService()
+
+        let foodExpense = Transaction(
+            amount: 1000,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Restaurant",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .cash,
+            note: nil,
+            source: .manual
+        )
+
+        let foodIncome = Transaction(
+            amount: 2000,
+            currencyCode: "TWD",
+            type: .income,
+            date: .now,
+            merchantName: "Salary",
+            categoryName: "Food",
+            category: nil,
+            paymentMethod: .bankTransfer,
+            note: nil,
+            source: .manual
+        )
+
+        let shoppingExpense = Transaction(
+            amount: 3000,
+            currencyCode: "TWD",
+            type: .expense,
+            date: .now,
+            merchantName: "Department Store",
+            categoryName: "Shopping",
+            category: nil,
+            paymentMethod: .creditCard,
+            note: nil,
+            source: .manual
+        )
+
+        mockService.transactions = [
+            foodExpense,
+            foodIncome,
+            shoppingExpense
+        ]
+
+        let viewModel = TransactionViewModel(service: mockService)
+
+        try viewModel.loadTransactions()
+
+        viewModel.selectedFilter = .expense
+        viewModel.selectedCategory = "Food"
+
+        XCTAssertEqual(
+            viewModel.filteredTransactions,
+            [foodExpense]
+        )
+    }
 }

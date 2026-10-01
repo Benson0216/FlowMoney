@@ -38,6 +38,7 @@ final class TransactionViewModel {
 
     var transactions: [Transaction] = []
     var selectedFilter: TransactionFilter = .all
+    var selectedCategory: String?
     var sortOption: TransactionSortOption = .newestFirst
     var dateFilter: TransactionDateFilter = .all
     var totalIncome: Decimal {
@@ -104,15 +105,25 @@ final class TransactionViewModel {
     }
 
     var filteredTransactions: [Transaction] {
+        let typeFilteredTransactions: [Transaction]
+
         switch selectedFilter {
         case .all:
-            transactions
+            typeFilteredTransactions = transactions
         case .income:
-            transactions.filter { $0.type == .income }
+            typeFilteredTransactions = transactions.filter { $0.type == .income }
         case .expense:
-            transactions.filter { $0.type == .expense }
+            typeFilteredTransactions = transactions.filter { $0.type == .expense }
         case .transfer:
-            transactions.filter { $0.type == .transfer }
+            typeFilteredTransactions = transactions.filter { $0.type == .transfer }
+        }
+
+        guard let selectedCategory else {
+            return typeFilteredTransactions
+        }
+
+        return typeFilteredTransactions.filter {
+            $0.categoryName == selectedCategory
         }
     }
 

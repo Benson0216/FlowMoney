@@ -88,6 +88,23 @@ struct TransactionListView: View {
                             Text("Transfer").tag(TransactionFilter.transfer)
                         }
 
+                        Picker(
+                            "Category",
+                            selection: Binding(
+                                get: { viewModel.selectedCategory ?? "All" },
+                                set: { value in
+                                    viewModel.selectedCategory = value == "All" ? nil : value
+                                }
+                            )
+                        ) {
+                            Text("All").tag("All")
+
+                            ForEach(categoryViewModel.categories) { category in
+                                Text(category.name)
+                                    .tag(category.name)
+                            }
+                        }
+
                         Picker("Date", selection: Binding(
                             get: { viewModel.dateFilter },
                             set: { viewModel.dateFilter = $0 }
@@ -141,6 +158,7 @@ struct TransactionListView: View {
             }
             .task {
                 try? viewModel.loadTransactions()
+                try? categoryViewModel.loadCategories()
             }
         }
     }
