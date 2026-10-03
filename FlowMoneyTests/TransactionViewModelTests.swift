@@ -433,10 +433,21 @@ final class TransactionViewModelTests: XCTestCase {
 
     func testFilterTransactionsByDateRange() throws {
         let mockService = MockTransactionService()
-        let viewModel = TransactionViewModel(service: mockService)
 
         let calendar = Calendar.current
-        let now = Date()
+        let now = calendar.date(
+            from: DateComponents(
+                year: 2026,
+                month: 10,
+                day: 15,
+                hour: 12
+            )
+        )!
+
+        let viewModel = TransactionViewModel(
+            service: mockService,
+            now: { now }
+        )
 
         let today = calendar.startOfDay(for: now)
         let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!

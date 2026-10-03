@@ -129,7 +129,7 @@ final class TransactionViewModel {
 
     var dateFilteredTransactions: [Transaction] {
         let calendar = Calendar.current
-        let now = Date()
+        let now = self.now()
         let sourceTransactions = filteredTransactions
 
         switch dateFilter {
@@ -192,9 +192,14 @@ final class TransactionViewModel {
     }
     
     private let service: TransactionServiceProtocol
+    private let now: () -> Date
 
-    init(service: TransactionServiceProtocol) {
+    init(
+        service: TransactionServiceProtocol,
+        now: @escaping () -> Date = Date.init
+    ) {
         self.service = service
+        self.now = now
     }
     
     func loadTransactions() throws {
